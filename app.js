@@ -12,17 +12,19 @@ const svg = d3.select('body')
 //Form variables declared here
 const form = d3.select('form')
 const formName = d3.select('#name')
-const formCulture = d3.select('#culture')
+const formTitle = d3.select('#title')
+const formLocation = d3.select('#location')
+const formLinks = d3.select('#links')
 
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 let nodes = [
-  { id: 0, name: 'John Snow', title: 'Lord of Winterfell', culture: 'Northmen', reflexive: false },
-  { id: 1, name: 'Sansa Stark', title: 'Lady of Winterfell', culture: 'Northmen', reflexive: true },
-  { id: 2, name: 'Petyr Baelish', title: 'Littlefinger', culture: 'Southern', reflexive: false }
-],
+  { id: 0, name: 'John Snow', title: 'Lord of Winterfell', location: 'Winterfell', reflexive: false },
+  { id: 1, name: 'Sansa Stark', title: 'Lady of Winterfell', location: 'Winterfell', reflexive: true },
+  { id: 2, name: 'Petyr Baelish', title: 'Littlefinger', location: 'Capitol', reflexive: false }
+  ],
   lastNodeId = 2,
   links = [
     { source: nodes[0], target: nodes[1], left: false, right: true },
@@ -72,10 +74,10 @@ let path = svg.append('svg:g').selectAll('path'),
 
 // mouse event vars
 let selected_node = null,
-  selected_link = null,
-  mousedown_link = null,
-  mousedown_node = null,
-  mouseup_node = null;
+    selected_link = null,
+    mousedown_link = null,
+    mousedown_node = null,
+    mouseup_node = null;
 
 function resetMouseVars() {
   mousedown_node = null;
@@ -252,8 +254,9 @@ function restart() {
 function formUpdate(event) {
   //update the data on the selected node based on the form input
   let nodeId = selected_node.id;
-  nodes[nodeId].name = d3.select('#name').property('value');
-  nodes[nodeId].culture = d3.select('#culture').property('value');
+  nodes[nodeId].name = formName.property('value');
+  nodes[nodeId].title = formTitle.property('value');
+  nodes[nodeId].location = formLocation.property('value');
 
   //filter by id to find the correct circle and grab the child text element
   let allCircles = circle.enter()
@@ -268,17 +271,61 @@ function formUpdate(event) {
 }
 
 function mousedown() {
-  // prevent I-bar on drag
-  //d3.event.preventDefault();
   // because :active only works in WebKit?
   svg.classed('active', true);
 
   if (!selected_node) {
     form.style('opacity', 0)
     document.getElementById('form').reset();
+    d3.selectAll('.link').remove()
   } else {
     formName.attr('placeholder', selected_node.name)
-    formCulture.attr('placeholder', selected_node.culture)
+    formTitle.attr('placeholder', selected_node.title)
+    formLocation.attr('placeholder', selected_node.location)
+
+    let connections = formLinks.append('div').selectAll('link')
+    console.log(connections)
+    // connections = connections.data(links)
+    // connections.enter().append('div')
+    //   .attr()
+    //   .classed()
+    //   .style()
+
+
+      // let path = svg.append('svg:g').selectAll('path'),
+    // path = path.data(links);
+    // path.enter().append('svg:path')
+    //   .attr('class', 'link')
+    //   .classed('selected', function (d) { return d === selected_link; })
+    //   .style('marker-start', function (d) { return d.left ? 'url(#start-arrow)' : ''; })
+    //   .style('marker-end', function (d) { return d.right ? 'url(#end-arrow)' : ''; })
+    //   .on('mousedown', function (d) {
+    //     // if (d3.event.ctrlKey) return;
+
+    //     // select link
+    //     mousedown_link = d;
+    //     if (mousedown_link === selected_link) selected_link = null;
+    //     else selected_link = mousedown_link;
+    //     selected_node = null;
+    //     restart();
+    //   });
+    // // remove old links
+    // path.exit().remove();
+
+    //filter all links by id to get selected node's links
+    let selectedLinks = links.filter(link => (link.source.id === selected_node.id))
+    console.log("testing link format: ", links[0].source.id)
+    console.log('selected node: ', selected_node)
+    console.log(selectedLinks)
+
+    //create a div for each link and display the name of the associated node
+    selectedLinks.forEach(link => {
+      console.log('this link name: ', link.target.name)
+      formLinks.append('div')
+      .text(link.target.name)
+      .attr('class', 'link')
+    })
+
     form.style('opacity', 1)
   }
 
