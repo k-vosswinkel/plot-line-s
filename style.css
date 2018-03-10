@@ -6,6 +6,7 @@ svg {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  float: left;
 }
 
 svg:not(.active):not(.ctrl) {
@@ -56,5 +57,12 @@ text.id {
 }
 
 .form {
-  background-color: blue;
+  float: left;
+  height: 300px;
+  width: 250px;
+  opacity: 0;
+}
+
+input {
+  z-index: 2;
 }
