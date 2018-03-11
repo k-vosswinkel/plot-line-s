@@ -202,10 +202,17 @@ function restart() {
       d3.select(this).attr('transform', '');
 
       // add link to graph (update if exists)
+      // NB: links are strictly source < target; arrows separately specified by booleans
       let source, target, direction;
+      if (mousedown_node.id < mouseup_node.id) {
         source = mousedown_node;
         target = mouseup_node;
         direction = 'right';
+      } else {
+        source = mouseup_node;
+        target = mousedown_node;
+        direction = 'left';
+      }
 
       let link;
       link = links.filter(function (l) {
@@ -339,18 +346,6 @@ function spliceLinksForNode(node) {
   });
 }
 
-function deleteNodeOrLink() {
-  if (selected_node) {
-    nodes.splice(nodes.indexOf(selected_node), 1);
-    spliceLinksForNode(selected_node);
-  } else if (selected_link) {
-    links.splice(links.indexOf(selected_link), 1);
-  }
-  selected_link = null;
-  selected_node = null;
-  restart();
-}
-
 // only respond once per keydown
 // let lastKeyDown = -1;
 
@@ -366,6 +361,20 @@ function deleteNodeOrLink() {
 //     svg.classed('ctrl', true);
 //   }
 
+//   if (!selected_node && !selected_link) return;
+//   switch (d3.event.keyCode) {
+//     case 8: // backspace
+//     case 46: // delete
+//       if (selected_node) {
+//         nodes.splice(nodes.indexOf(selected_node), 1);
+//         spliceLinksForNode(selected_node);
+//       } else if (selected_link) {
+//         links.splice(links.indexOf(selected_link), 1);
+//       }
+//       selected_link = null;
+//       selected_node = null;
+//       restart();
+//       break;
 //     case 66: // B
 //       if (selected_link) {
 //         // set link direction to both left and right
@@ -412,5 +421,7 @@ function deleteNodeOrLink() {
 svg.on('mousedown', mousedown)
   .on('mousemove', mousemove)
   .on('mouseup', mouseup);
-
+// d3.select(window)
+//   .on('keydown', keydown)
+//   .on('keyup', keyup);
 restart();
