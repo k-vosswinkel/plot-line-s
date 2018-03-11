@@ -15,15 +15,34 @@ const formName = d3.select('#name')
 const formTitle = d3.select('#title')
 const formLocation = d3.select('#location')
 const formLinks = d3.select('#links')
+const formColor = d3.select('#color')
 
 // set up initial nodes and links
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 let nodes = [
-  { id: 0, name: 'John Snow', title: 'Lord of Winterfell', location: 'Winterfell', reflexive: false },
-  { id: 1, name: 'Sansa Stark', title: 'Lady of Winterfell', location: 'Winterfell', reflexive: true },
-  { id: 2, name: 'Petyr Baelish', title: 'Littlefinger', location: 'Capitol', reflexive: false }
-  ],
+  {
+    id: 0,
+    name: 'John Snow',
+    title: 'Lord Commander (Night\'s Watch)',
+    nickname: 'The Bastard of Winterfell',
+    location: 'Tower of Joy',
+    reflexive: false
+  }, {
+    id: 1,
+    name: 'Daenerys Targaryen',
+    title: 'Queen of the Andals & First Men',
+    nickname: 'Mother of Dragons',
+    location: 'Dragonstone',
+    reflexive: true
+  }, {
+    id: 2,
+    name: 'Cersei Lannister',
+    title: 'Queen of the Seven Kingdoms',
+    nickname: 'Evil Queen',
+    location: 'Casterly Rock',
+    reflexive: false
+  }],
   lastNodeId = 2,
   links = [
     { source: nodes[0], target: nodes[1], left: false, right: true },
@@ -49,7 +68,7 @@ svg.append('svg:defs').append('svg:marker')
   .attr('orient', 'auto')
   .append('svg:path')
   .attr('d', 'M0,-5L10,0L0,5')
-  .attr('fill', '#000');
+  .attr('fill', '#8f8f8f');
 
 svg.append('svg:defs').append('svg:marker')
   .attr('id', 'start-arrow')
@@ -228,8 +247,8 @@ function restart() {
 
   // show node IDs
   g.append('svg:text')
-    .attr('x', 50)
-    .attr('y', 4)
+    .attr('x', 0)
+    .attr('y', -20)
     .attr('class', 'id')
     .text(function (d) {
       return d.name;
@@ -250,12 +269,17 @@ function formUpdate(event) {
   nodes[nodeId].title = formTitle.property('value');
   nodes[nodeId].location = formLocation.property('value');
 
-  //filter by id to find the correct circle and grab the child text element
+  //filter by id to find the correct circle
   let allCircles = circle.enter()
   let selectedCircle = allCircles[0].update.filter(ourCircle => (ourCircle.__data__.id === nodeId))
+
+  //change color based on form data
+  let innerCircle = d3.select(selectedCircle[0].firstChild)
+  d3.select(innerCircle[0][0]).style('fill', formColor.property('value'))
+
+  //grab the child text element and add new text from form to circle
   let innerText = selectedCircle[0].lastChild
 
-  //add new text from form to circle
   d3.select(innerText)
     .text(function(d){
       return d.name
@@ -339,6 +363,18 @@ function spliceLinksForNode(node) {
   });
 }
 
+function deleteNode() {
+  if (selected_node) {
+    nodes.splice(nodes.indexOf(selected_node), 1);
+    spliceLinksForNode(selected_node);
+  } else if (selected_link) {
+    links.splice(links.indexOf(selected_link), 1);
+  }
+  selected_link = null;
+  selected_node = null;
+  restart();
+}
+
 // only respond once per keydown
 // let lastKeyDown = -1;
 
@@ -400,4 +436,5 @@ function spliceLinksForNode(node) {
 svg.on('mousedown', mousedown)
   .on('mousemove', mousemove)
   .on('mouseup', mouseup);
+
 restart();
