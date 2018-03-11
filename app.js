@@ -17,7 +17,6 @@ const formLocation = d3.select('#location')
 const formLinks = d3.select('#links')
 
 // set up initial nodes and links
-//  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 let nodes = [
@@ -203,17 +202,10 @@ function restart() {
       d3.select(this).attr('transform', '');
 
       // add link to graph (update if exists)
-      // NB: links are strictly source < target; arrows separately specified by booleans
       let source, target, direction;
-      if (mousedown_node.id < mouseup_node.id) {
         source = mousedown_node;
         target = mouseup_node;
         direction = 'right';
-      } else {
-        source = mouseup_node;
-        target = mousedown_node;
-        direction = 'left';
-      }
 
       let link;
       link = links.filter(function (l) {
@@ -275,56 +267,29 @@ function mousedown() {
   svg.classed('active', true);
 
   if (!selected_node) {
+    //hide the form
     form.style('opacity', 0)
+    //reset form inputs
     document.getElementById('form').reset();
-    d3.selectAll('.link').remove()
+    //remove all relationship elements for the selected node
+    let allLinks = document.getElementById('links')
+    while (allLinks.firstChild) {
+      allLinks.removeChild(allLinks.firstChild);
+    }
   } else {
     formName.attr('placeholder', selected_node.name)
     formTitle.attr('placeholder', selected_node.title)
     formLocation.attr('placeholder', selected_node.location)
 
-    let connections = formLinks.append('div').selectAll('link')
-    console.log(connections)
-    // connections = connections.data(links)
-    // connections.enter().append('div')
-    //   .attr()
-    //   .classed()
-    //   .style()
-
-
-      // let path = svg.append('svg:g').selectAll('path'),
-    // path = path.data(links);
-    // path.enter().append('svg:path')
-    //   .attr('class', 'link')
-    //   .classed('selected', function (d) { return d === selected_link; })
-    //   .style('marker-start', function (d) { return d.left ? 'url(#start-arrow)' : ''; })
-    //   .style('marker-end', function (d) { return d.right ? 'url(#end-arrow)' : ''; })
-    //   .on('mousedown', function (d) {
-    //     // if (d3.event.ctrlKey) return;
-
-    //     // select link
-    //     mousedown_link = d;
-    //     if (mousedown_link === selected_link) selected_link = null;
-    //     else selected_link = mousedown_link;
-    //     selected_node = null;
-    //     restart();
-    //   });
-    // // remove old links
-    // path.exit().remove();
-
     //filter all links by id to get selected node's links
     let selectedLinks = links.filter(link => (link.source.id === selected_node.id))
-    console.log("testing link format: ", links[0].source.id)
-    console.log('selected node: ', selected_node)
-    console.log(selectedLinks)
 
+    let connections = formLinks.selectAll('link')
+    connections = connections.data(selectedLinks)
     //create a div for each link and display the name of the associated node
-    selectedLinks.forEach(link => {
-      console.log('this link name: ', link.target.name)
-      formLinks.append('div')
-      .text(link.target.name)
+    connections.enter().append('div')
       .attr('class', 'link')
-    })
+      .text((d) => (d.target.name))
 
     form.style('opacity', 1)
   }
@@ -374,6 +339,18 @@ function spliceLinksForNode(node) {
   });
 }
 
+function deleteNodeOrLink() {
+  if (selected_node) {
+    nodes.splice(nodes.indexOf(selected_node), 1);
+    spliceLinksForNode(selected_node);
+  } else if (selected_link) {
+    links.splice(links.indexOf(selected_link), 1);
+  }
+  selected_link = null;
+  selected_node = null;
+  restart();
+}
+
 // only respond once per keydown
 // let lastKeyDown = -1;
 
@@ -389,20 +366,6 @@ function spliceLinksForNode(node) {
 //     svg.classed('ctrl', true);
 //   }
 
-//   if (!selected_node && !selected_link) return;
-//   switch (d3.event.keyCode) {
-//     case 8: // backspace
-//     case 46: // delete
-//       if (selected_node) {
-//         nodes.splice(nodes.indexOf(selected_node), 1);
-//         spliceLinksForNode(selected_node);
-//       } else if (selected_link) {
-//         links.splice(links.indexOf(selected_link), 1);
-//       }
-//       selected_link = null;
-//       selected_node = null;
-//       restart();
-//       break;
 //     case 66: // B
 //       if (selected_link) {
 //         // set link direction to both left and right
@@ -449,7 +412,5 @@ function spliceLinksForNode(node) {
 svg.on('mousedown', mousedown)
   .on('mousemove', mousemove)
   .on('mouseup', mouseup);
-// d3.select(window)
-//   .on('keydown', keydown)
-//   .on('keyup', keyup);
+
 restart();
