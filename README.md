@@ -1,6 +1,4 @@
-# plot-line-s
-
-plot-lines
+# plot-lines
 An app for tracking characters in tv shows or books
 
 Inspired By
