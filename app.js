@@ -59,6 +59,13 @@ let nodes = [
 //   .linkDistance(150)
 //   .charge(-500)
 //   .on('tick', tick)
+const force = d3.forceSimulation()
+  .force("link", d3.forceLink().id(function (d) { return d.index }))
+  .force("collide", d3.forceCollide(function (d) { return d.r + 8 }).iterations(16))
+  .force("charge", d3.forceManyBody())
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("y", d3.forceY(0))
+  .force("x", d3.forceX(0))
 
 // define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
