@@ -52,20 +52,21 @@ let nodes = [
   ];
 
 // init D3 force layout
-// const force = d3.layout.force()
-//   .nodes(nodes)
-//   .links(links)
-//   .size([width, height])
-//   .linkDistance(150)
-//   .charge(-500)
-//   .on('tick', tick)
-const force = d3.forceSimulation()
-  .force("link", d3.forceLink().id(function (d) { return d.index }))
-  .force("collide", d3.forceCollide(function (d) { return d.r + 8 }).iterations(16))
-  .force("charge", d3.forceManyBody())
-  .force("center", d3.forceCenter(width / 2, height / 2))
-  .force("y", d3.forceY(0))
-  .force("x", d3.forceX(0))
+const force = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).distance(150))
+  .force("charge", d3.forceCollide().radius(5))
+  .force("r", d3.forceRadial(function (d) { return d.type === "a" ? 100 : 200; }))
+  // .on('tick', tick)
+  .force("y", d3.forceY(300))
+  .force("x", d3.forceX(100))
+
+// const force = d3.forceSimulation()
+//   .force("link", d3.forceLink().id(function (d) { return d.index }))
+//   .force("collide", d3.forceCollide(function (d) { return d.r + 8 }).iterations(16))
+//   .force("charge", d3.forceManyBody())
+//   .force("center", d3.forceCenter(width / 2, height / 2))
+//   .force("y", d3.forceY(0))
+//   .force("x", d3.forceX(0))
 
 // define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
@@ -154,8 +155,6 @@ function restart() {
     .style('marker-start', function (d) { return d.left ? 'url(#start-arrow)' : ''; })
     .style('marker-end', function (d) { return d.right ? 'url(#end-arrow)' : ''; })
     .on('mousedown', function (d) {
-      // if (d3.event.ctrlKey) return;
-
       // select link
       mousedown_link = d;
       if (mousedown_link === selected_link) selected_link = null;
