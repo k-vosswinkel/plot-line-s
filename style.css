@@ -1,16 +1,22 @@
+html {
+  background-color: white;
+}
+
+/* #svgBox {
+  background-color: purple;
+} */
+
 svg {
-  background-color: #FFF;
+  border: solid 1px #ccc;
+  margin: 20px;
+  box-shadow: 2px 2px 2px rgb(237, 237, 237) inset;
+  border-radius: 3px;
   cursor: default;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  float: left;
-}
-
-svg:not(.active):not(.ctrl) {
-  cursor: crosshair;
 }
 
 path.link {
@@ -18,10 +24,6 @@ path.link {
   stroke: #8f8f8f;
   stroke-width: 2px;
   cursor: default;
-}
-
-svg:not(.active):not(.ctrl) path.link {
-  cursor: pointer;
 }
 
 path.link.selected {
@@ -47,22 +49,28 @@ circle.node.reflexive {
 }
 
 text {
-  font: 12px sans-serif;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
   pointer-events: none;
 }
 
 text.id {
-  text-anchor: middle;
-  font-weight: bold;
+  text-anchor: left;
+}
+
+.form-group {
+  margin: 10px;
 }
 
 .form {
-  float: left;
-  height: 300px;
+  background-color: white;
+  height: 500px;
   width: 250px;
-  opacity: 0;
+  padding: 10px;
 }
 
-input {
-  z-index: 2;
+.btn {
+  margin-top: 10px;
 }

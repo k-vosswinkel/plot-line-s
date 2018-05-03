@@ -1,17 +1,20 @@
 // set up SVG for D3
-const width = 960,
-  height = 500,
-  colors = d3.scale.category10();
+const width = 760,
+  height = 550;
+  // colors = d3.scale.category20b();
+  colors = d3.interpolateRainbow()
 
-const svg = d3.select('body')
+const svg = d3.select('#svgBox')
   .append('svg')
   .attr('oncontextmenu', 'return false;')
-  .attr('width', width)
-  .attr('height', height);
+  .attr('width', 760)
+  .attr('height', 550);
+
+console.log(svg)
 
 //Form variables declared here
 const form = d3.select('form')
-const formName = d3.select('#name')
+const formName = d3.select('#charName')
 const formTitle = d3.select('#title')
 const formLocation = d3.select('#location')
 const formLinks = d3.select('#links')
@@ -23,10 +26,10 @@ const formColor = d3.select('#color')
 let nodes = [
   {
     id: 0,
-    name: 'John Snow',
-    title: 'Lord Commander (Night\'s Watch)',
-    nickname: 'The Bastard of Winterfell',
-    location: 'Tower of Joy',
+    name: 'Ned Stark',
+    title: 'Lord of Winterfell',
+    nickname: 'The Quiet Wolf',
+    location: 'Winterfell',
     reflexive: false
   }, {
     id: 1,
@@ -45,18 +48,18 @@ let nodes = [
   }],
   lastNodeId = 2,
   links = [
-    { source: nodes[0], target: nodes[1], left: false, right: true },
-    { source: nodes[1], target: nodes[2], left: false, right: true }
+    { source: nodes[0], target: nodes[1], left: false, right: true, relationship: 'Family' },
+    { source: nodes[2], target: nodes[0], left: false, right: true, relationship: 'Murder' }
   ];
 
 // init D3 force layout
-const force = d3.layout.force()
-  .nodes(nodes)
-  .links(links)
-  .size([width, height])
-  .linkDistance(150)
-  .charge(-500)
-  .on('tick', tick)
+// const force = d3.layout.force()
+//   .nodes(nodes)
+//   .links(links)
+//   .size([width, height])
+//   .linkDistance(150)
+//   .charge(-500)
+//   .on('tick', tick)
 
 // define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
@@ -162,10 +165,38 @@ function restart() {
   // NB: the function arg is crucial here! nodes are known by id, not by index!
   circle = circle.data(nodes, function (d) { return d.id; });
 
+  //helper function to brighten custom colors
+  function ColorLuminance(hex, lum) {
+
+    // validate hex string
+    hex = String(hex).replace(/[^0-9a-f]/gi, '');
+    if (hex.length < 6) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    lum = lum || 0;
+
+    // convert to decimal and change luminosity
+    var rgb = "#", c, i;
+    for (i = 0; i < 3; i++) {
+      c = parseInt(hex.substr(i * 2, 2), 16);
+      c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+      rgb += ("00" + c).substr(c.length);
+    }
+
+    return rgb;
+  }
+
   // update existing nodes (reflexive & selected visual states)
   circle.selectAll('circle')
-    .style('fill', function (d) { return (d === selected_node) ? d3.rgb(colors(d.id))
-    .brighter().toString() : colors(d.id); })
+    .style('fill', function (d) {
+      console.log(d)
+      if (d.color) {
+        return (d === selected_node) ? ColorLuminance(d.color, 0.4) : d.color;
+      } else {
+        return (d === selected_node) ? d3.rgb(colors(d.id))
+          .brighter().toString() : colors(d.id);
+      }
+    })
     .classed('reflexive', function (d) { return d.reflexive; });
 
   // add new nodes
@@ -174,7 +205,6 @@ function restart() {
     .attr('class', 'node')
     .attr('r', 12)
     .style('fill', function (d) { return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
-    .style('stroke', function (d) { return d3.rgb(colors(d.id)).darker().toString(); })
     .classed('reflexive', function (d) { return d.reflexive; })
     .on('mouseover', function (d) {
       if (!mousedown_node || d === mousedown_node) return;
@@ -247,8 +277,8 @@ function restart() {
 
   // show node IDs
   g.append('svg:text')
-    .attr('x', 0)
-    .attr('y', -20)
+    .attr('x', 20)
+    .attr('y', 5)
     .attr('class', 'id')
     .text(function (d) {
       return d.name;
@@ -258,7 +288,7 @@ function restart() {
   circle.exit().remove();
 
   // set the graph in motion
-  force.start();
+  // force.start();
 }
 
 //Our form button submit
@@ -268,6 +298,7 @@ function formUpdate(event) {
   nodes[nodeId].name = formName.property('value');
   nodes[nodeId].title = formTitle.property('value');
   nodes[nodeId].location = formLocation.property('value');
+  nodes[nodeId].color = formColor.property('value');
 
   //filter by id to find the correct circle
   let allCircles = circle.enter()
@@ -290,21 +321,23 @@ function mousedown() {
   // because :active only works in WebKit?
   svg.classed('active', true);
 
-  if (!selected_node) {
-    //hide the form
-    form.style('opacity', 0)
-    //reset form inputs
-    document.getElementById('form').reset();
-    //remove all relationship elements for the selected node
+  //helper function to remove relationship elements from display
+  function clearLinks(){
     let allLinks = document.getElementById('links')
     while (allLinks.firstChild) {
       allLinks.removeChild(allLinks.firstChild);
     }
-  } else {
-    formName.attr('placeholder', selected_node.name)
-    formTitle.attr('placeholder', selected_node.title)
-    formLocation.attr('placeholder', selected_node.location)
+  }
 
+  if (!selected_node) {
+    //reset form inputs
+    document.getElementById('form').reset();
+    clearLinks();
+  } else {
+    formName.attr('value', selected_node.name)
+    formTitle.attr('value', selected_node.title)
+    formLocation.attr('value', selected_node.location)
+    clearLinks();
     //filter all links by id to get selected node's links
     let selectedLinks = links.filter(link => (link.source.id === selected_node.id))
 
@@ -313,9 +346,7 @@ function mousedown() {
     //create a div for each link and display the name of the associated node
     connections.enter().append('div')
       .attr('class', 'link')
-      .text((d) => (d.target.name))
-
-    form.style('opacity', 1)
+      .text((d) => (`${d.target.name}: ${d.relationship}`))
   }
 
   if (d3.event.ctrlKey || mousedown_node || mousedown_link) return;
@@ -375,61 +406,12 @@ function deleteNode() {
   restart();
 }
 
-// only respond once per keydown
-// let lastKeyDown = -1;
+// function moveGraph() {
+//   circle.call(force.drag);
 
-// function keydown() {
-//   d3.event.preventDefault();
-
-//   if (lastKeyDown !== -1) return;
-//   lastKeyDown = d3.event.keyCode;
-
-//   // ctrl
-//   if (d3.event.keyCode === 17) {
-//     circle.call(force.drag);
-//     svg.classed('ctrl', true);
-//   }
-
-//     case 66: // B
-//       if (selected_link) {
-//         // set link direction to both left and right
-//         selected_link.left = true;
-//         selected_link.right = true;
-//       }
-//       restart();
-//       break;
-//     case 76: // L
-//       if (selected_link) {
-//         // set link direction to left only
-//         selected_link.left = true;
-//         selected_link.right = false;
-//       }
-//       restart();
-//       break;
-//     case 82: // R
-//       if (selected_node) {
-//         // toggle node reflexivity
-//         selected_node.reflexive = !selected_node.reflexive;
-//       } else if (selected_link) {
-//         // set link direction to right only
-//         selected_link.left = false;
-//         selected_link.right = true;
-//       }
-//       restart();
-//       break;
-//   }
-// }
-
-// function keyup() {
-//   lastKeyDown = -1;
-
-//   // ctrl
-//   if (d3.event.keyCode === 17) {
-//     circle
-//       .on('mousedown.drag', null)
-//       .on('touchstart.drag', null);
-//     svg.classed('ctrl', false);
-//   }
+//   circle
+//     .on('mousedown.drag', null)
+//     .on('touchstart.drag', null);
 // }
 
 // app starts here

@@ -5,14 +5,15 @@
   <meta charset="utf-8">
   <title>Plot Lines</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 
-<body>
-  <form id="form" class="form">
-    <h2>Character Info</h2>
+<body class="row">
+  <form id="form" class="form col s3 offset-s1">
+    <h3>Character Info</h3>
     <div class="form-group">
-      <label for="name">Name</label>
-      <input class="form-control" id="name" type="text" name="name">
+      <label for="charName">Name</label>
+      <input class="form-control" id="charName" type="text" name="charName">
     </div>
     <div class="form-group">
       <label for="title">Title</label>
@@ -23,6 +24,10 @@
       <input class="form-control" id="location" type="text" name="location">
     </div>
     <div class="form-group">
+      <label for="relationship">Relationship</label>
+      <input class="form-control" id="relationship" type="text" name="relationship">
+    </div>
+    <div class="form-group">
       <label for="color">Color</label>
       <input class="form-control" id="color" type="color" name="color">
     </div>
@@ -30,22 +35,21 @@
       <label for="links">Relationships:</label>
       <div id="links"></div>
     </div>
-    <button class="btn btn-success" type="button" onclick="formUpdate()">Update Character Info</button>
-    <button class="btn btn-danger" type="button" onclick="deleteNode()">Delete Node</button>
+    <!-- <button class="btn btn-warning" type="button" onclick="moveGraph()">Move graph</button> -->
+    <button class="waves-effect waves-light btn indigo" type="button" onclick="formUpdate()">Update Character Info</button>
+    <button class="waves-effect waves-light btn deep-orange" type="button" onclick="deleteNode()">Delete Node</button>
   </form>
-  <div id="svgBox"></div>
+  <div id="svgBox" class="col s7"></div>
 </body>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<!-- D3 and App.js files -->
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+<script src="https://d3js.org/d3.v5.js"></script>
 <script src="app.js"></script>
 
-<!-- JQuery CDN -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
 
-<!-- Bootstrap CDNs -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-  crossorigin="anonymous">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-  crossorigin="anonymous"></script>
+<!-- Compiled and minified JavaScript -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script> -->
 </html>
