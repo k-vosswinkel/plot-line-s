@@ -1,8 +1,7 @@
 // set up SVG for D3
 const width = 760,
   height = 550;
-  // colors = d3.scale.category20b();
-  colors = d3.interpolateRainbow()
+  let colors = d3.interpolateRainbow;
 
 const svg = d3.select('#svgBox')
   .append('svg')
@@ -204,7 +203,9 @@ function restart() {
   g.append('svg:circle')
     .attr('class', 'node')
     .attr('r', 12)
-    .style('fill', function (d) { return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
+    .style('fill', function (d) {
+      return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
+    })
     .classed('reflexive', function (d) { return d.reflexive; })
     .on('mouseover', function (d) {
       if (!mousedown_node || d === mousedown_node) return;
