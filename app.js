@@ -56,7 +56,7 @@ const force = d3.forceSimulation(nodes)
   .force("link", d3.forceLink(links).distance(150))
   .force("charge", d3.forceCollide().radius(5))
   .force("r", d3.forceRadial(function (d) { return d.type === "a" ? 100 : 200; }))
-  // .on('tick', tick)
+  .on('tick', tick)
   .force("y", d3.forceY(300))
   .force("x", d3.forceX(100))
 
@@ -117,6 +117,7 @@ function resetMouseVars() {
 function tick() {
   // draw directed edges with proper padding from node centers
   path.attr('d', function (d) {
+    console.log('in d function')
     let deltaX = d.target.x - d.source.x,
       deltaY = d.target.y - d.source.y,
       dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
