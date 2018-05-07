@@ -131,9 +131,11 @@ function tick() {
     return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
   });
 
-  circle.attr('transform', function (d) {
-    return 'translate(' + d.x + ',' + d.y + ')';
-  });
+  console.log("here's a circle: ", circle)
+  // circle.attr('transform', function (d) {
+  //   console.log('d: ', d)
+  //   return 'translate(' + d.x + ',' + d.y + ')';
+  // });
 }
 
 // update graph (called when needed)
