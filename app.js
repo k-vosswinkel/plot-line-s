@@ -123,6 +123,7 @@ function tick() {
   });
 
   circle.attr('transform', function (d) {
+    console.log('d x:', d.x)
     return 'translate(' + d.x + ',' + d.y + ')';
   });
 }
