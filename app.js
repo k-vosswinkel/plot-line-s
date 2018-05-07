@@ -51,6 +51,7 @@ let nodes = [
   ];
 
 // init D3 force layout
+// This will have to be re-written in V4; passing in nodes and links to initialize and set width and height
 const force = d3.layout.force()
   .nodes(nodes)
   .links(links)
@@ -122,8 +123,9 @@ function tick() {
     return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
   });
 
+  // Here each circle ('g' element) is given x and y coordinates based off of each node ('d' element) -- not sure where the nodes are getting x and y coordinates though
   circle.attr('transform', function (d) {
-    console.log('d x:', d.x)
+    console.log('d: ', d)
     return 'translate(' + d.x + ',' + d.y + ')';
   });
 }
