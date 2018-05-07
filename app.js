@@ -131,7 +131,7 @@ function tick() {
     return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
   });
 
-  // d3.selectAll('circle').attr('name', 'betsy');
+  //selecting all circle elements and transform-translating them based on their contents' x and y coordinates
   d3.selectAll('circle').attr('transform', function (d) {
     console.log('d: ', d)
     return 'translate(' + d.x + ',' + d.y + ')';
