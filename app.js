@@ -117,7 +117,6 @@ function resetMouseVars() {
 function tick() {
   // draw directed edges with proper padding from node centers
   path.attr('d', function (d) {
-    console.log('in d function')
     let deltaX = d.target.x - d.source.x,
       deltaY = d.target.y - d.source.y,
       dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
