@@ -1,7 +1,7 @@
 # Plot Lines
 For fans of books, films and television shows alike, Plot Lines allows users to track the ever-changing relationships between all of their favorite characters.
 
-# Written with
+## Written with
   * Javascript
   * D3
 
